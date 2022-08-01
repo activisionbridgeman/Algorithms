@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <tuple>
 using namespace std::chrono;
 
 // Simple bubble sort algorithm for a vector of ints (returns sorted vector in ascending order)
@@ -31,39 +32,8 @@ std::chrono::nanoseconds bubbleSort(std::vector<int>& arrayInput)
     return duration;
 }
 
-class Node {
-public:
-    char letter;
-    int cost;
-    Node *next;
-
-    Node(char letter, int cost, Node* next) {
-        this->letter = letter;
-        this->cost = cost;
-        this->next = next;
-    }
-};
-
-int aStar(std::vector<Node*> graph) 
-{
-    return 0;
-}
-
 int main()
 {
-    Node *a = new Node('a', 5, NULL);
-    Node *b = new Node('b', 1, NULL);
-    Node *c = new Node('c', 1, NULL);
-    Node *d = new Node('d', 7, NULL);
-
-    a->next = b;
-    b->next = c;
-    c->next = d;
-    d->next = a;
-
-    std::vector<Node*> graph = { a,b,c,d };
-    aStar(graph);
-
     std::vector<int> array1 = { 3, 2, 1 };
     std::vector<int> array2 = { 1, 2 };
     std::vector<int> array3 = { 10, 45, 5, 24, 26, 72, 0, -1, 2 };
