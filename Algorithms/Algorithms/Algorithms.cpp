@@ -1,12 +1,15 @@
 // Algorithms.cpp : This file contains the 'main' function. Program execution begins and ends there.
-// Created bubble sort algorithm and Dijkstra's algorithm
-// Dijkstra's algorithm was pulled and modified from https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/
+// Created bubble sort algorithm, BFS/DFS, and A* algorithm
+// A* algorithm was pulled and modified from https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/
 //
 
 #include <iostream>
 #include <vector>
 #include <chrono>
 #include <tuple>
+#include <stack>
+#include <string>
+using namespace std;
 using namespace std::chrono;
 
 // Number of vertices in graph
@@ -37,6 +40,89 @@ std::chrono::nanoseconds bubbleSort(std::vector<int>& arrayInput)
     return duration;
 }
 
+// Node struct for trees
+struct Node 
+{
+    char letter;
+    int data;
+    Node* left;
+    Node* right;
+
+    Node(char letter, int data, Node* left, Node* right) 
+    {
+        this->letter = letter;
+        this->data = data;
+        this->left = left;
+        this->right = right;
+    }
+};
+
+static bool found = false;
+
+// Check if node was found or not in DFS
+void foundCheck() {
+    if (!found) {
+        cout << "Node not found\n";
+        found = false;
+    }
+
+    else 
+    {
+        found = false;
+    }
+}
+
+// BFS algorithm
+void breadthFirstSearch(Node* tree, int data) 
+{
+    stack<Node*> queue;
+    queue.push(tree);
+
+    int children = 0;
+
+    while (!queue.empty()) 
+    {
+        Node* curr = queue.top();
+        queue.pop();
+
+        if (data == curr->data) 
+        {
+            cout << "Node with data " << to_string(data) << " is " << curr->letter << '\n';
+            return;
+        }
+
+        if (curr->left != NULL) 
+        {
+            queue.push(curr->left);
+        }
+
+        if (curr->right != NULL) 
+        {
+            queue.push(curr->right);
+        }
+    }
+
+    cout << "Node not found\n";
+}
+
+// DFS algorithm
+void depthFirstSearch(Node* tree, int data) 
+{
+    if (tree != NULL)
+    {
+        if (tree->data == data)
+        {
+            cout << "Node with data " << to_string(data) << " is " << tree->letter << '\n';
+            found = true;
+            return;
+        }
+
+        depthFirstSearch(tree->left, data);
+
+        depthFirstSearch(tree->right, data);
+    }
+}
+
 // A utility function to find the vertex with minimum distance value, from
 // the set of vertices not yet included in shortest path tree
 int minDistance(int dist[], bool sptSet[])
@@ -60,9 +146,10 @@ void printSolution(int dist[], int src)
     std::cout << "\n";
 }
 
-// Function that implements Dijkstra's single source shortest path algorithm
+// Function that implements A* algorithms's single source shortest path algorithm
 // for a graph represented using adjacency matrix representation
-void dijkstra(int graph[V][V], int src)
+// NOTE: This uses a heuristic of 0 (no heuristic)
+void astar(int graph[V][V], int src)
 {
     int dist[V]; // The output array.  dist[i] will hold the shortest
     // distance from src to i
@@ -103,6 +190,8 @@ void dijkstra(int graph[V][V], int src)
 
 int main()
 {
+    cout << "BUBBLE SORTING ARRAYS:\n";
+    // Bubble sort arrays
     std::vector<int> array1 = { 3, 2, 1 };
     std::vector<int> array2 = { 1, 2 };
     std::vector<int> array3 = { 10, 45, 5, 24, 26, 72, 0, -1, 2 };
@@ -110,6 +199,8 @@ int main()
     std::vector<int> array5 = { 0 };
 
     std::vector<std::vector<int>> arrays = { array1, array2, array3, array4, array5 };
+
+    cout << "Arrays before sorting:\n";
 
     for (int i = 0; i < (int)arrays.size(); i++) {
         std::cout << "Array " << i + 1 << ": ";
@@ -119,10 +210,14 @@ int main()
         std::cout << "\n";
     }
 
+    std::cout << "\n";
+
     for (int i = 0; i < (int) arrays.size(); i++) {
         std::chrono::nanoseconds seconds = bubbleSort(arrays[i]);
         std::cout << "Array " << i + 1 << " was sorted in " << seconds.count() << " nanoseconds.\n";
     }
+
+    std::cout << "\nArrays after sorting:\n";
 
     for (int i = 0; i < (int) arrays.size(); i++) {
         std::cout << "Array " << i+1 << ": ";
@@ -134,7 +229,47 @@ int main()
 
     std::cout << '\n';
 
-    // Create graph represented as adjacency matrix
+    cout << "PERFORM BFS AND DFS ON A TREE:\n";
+
+    // Perform BFS and DFS on a tree
+    Node* a = new Node('a', 1, NULL, NULL);
+    Node* b = new Node('b', 6, NULL, NULL);
+    Node* c = new Node('c', 2, NULL, NULL);
+    Node* d = new Node('d', 3, NULL, NULL);
+    Node* e = new Node('e', 9, NULL, NULL);
+    Node* f = new Node('f', 4, NULL, NULL);
+    Node* g = new Node('g', 5, NULL, NULL);
+
+    a->left = b;
+    a->right = c;
+    b->left = d;
+    b->right = e;
+    c->left = f;
+    c->right = g;
+
+    cout << "Breadth first search:\n";
+    breadthFirstSearch(a, 5);
+    breadthFirstSearch(a, 9);
+    breadthFirstSearch(a, 1);
+    breadthFirstSearch(a, 11);
+
+    cout << '\n';
+
+    cout << "Depth first search:\n";
+    depthFirstSearch(a, 5);
+    foundCheck();
+    depthFirstSearch(a, 9);
+    foundCheck();
+    depthFirstSearch(a, 1);
+    foundCheck();
+    depthFirstSearch(a, 11);
+    foundCheck();
+
+    cout << '\n';
+
+    cout << "USE A* ALGORITHM ON A GRAPH:\n";
+
+    // Use A* algorithm on an adjacency matrix
     int graph[V][V] = { { 0, 4, 0, 0, 0, 0, 0, 8, 0 },
                         { 4, 0, 8, 0, 0, 0, 0, 11, 0 },
                         { 0, 8, 0, 7, 0, 4, 0, 0, 2 },
@@ -145,9 +280,9 @@ int main()
                         { 8, 11, 0, 0, 0, 0, 1, 0, 7 },
                         { 0, 0, 2, 0, 0, 0, 6, 7, 0 } };
 
-    dijkstra(graph, 0);
-    dijkstra(graph, 6);
-    dijkstra(graph, 8);
+    astar(graph, 0);
+    astar(graph, 6);
+    astar(graph, 8);
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
